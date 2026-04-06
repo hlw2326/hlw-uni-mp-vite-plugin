@@ -27,12 +27,15 @@ jobs:
 
       - name: 安装依赖
         run: pnpm install
+        working-directory: mp-vite-plugin
 
       - name: 构建项目（可选）
         run: npm run build
         continue-on-error: true
+        working-directory: mp-vite-plugin
 
       - name: 发布到 npm
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: mp-vite-plugin
