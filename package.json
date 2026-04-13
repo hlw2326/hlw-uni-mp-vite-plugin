@@ -1,6 +1,6 @@
 {
     "name": "@hlw-uni/mp-vite-plugin",
-    "version": "1.0.7",
+    "version": "1.0.10",
     "description": "UniApp Vite 编译插件 — 环境变量注入、SCSS 主题、Auto-Import、全局 API 注入",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -21,7 +21,7 @@
     },
     "peerDependencies": {
         "@dcloudio/vite-plugin-uni": ">=3.0.0",
-        "@hlw-uni/mp-core": ">=1.0.5",
+        "@hlw-uni/mp-core": ">=1.0.10",
         "vite": ">=5.0.0"
     },
     "dependencies": {
@@ -31,7 +31,7 @@
     "devDependencies": {
         "@dcloudio/types": "^3.4.8",
         "@dcloudio/vite-plugin-uni": "3.0.0-4080420251103001",
-        "@hlw-uni/mp-core": "1.0.6",
+        "@hlw-uni/mp-core": "1.0.10",
         "@types/node": "^20.11.0",
         "typescript": "^4.9.4",
         "vite": "5.2.8",
