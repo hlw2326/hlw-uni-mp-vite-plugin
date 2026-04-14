@@ -10,6 +10,7 @@ export function applyThemePlugin({ primaryColor = '#3b82f6' }: ThemeOptions = {}
     css: {
       preprocessorOptions: {
         scss: {
+          api: 'modern-compiler',
           additionalData: `$primary-color: ${primaryColor} !default;\n`,
         },
       },
