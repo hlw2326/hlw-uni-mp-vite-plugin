@@ -27,6 +27,8 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "vite",
+        "fs",
+        "path",
         "@dcloudio/vite-plugin-uni",
         "@hlw-uni/mp-core",
         /^unplugin-/,
@@ -40,6 +42,8 @@ export default defineConfig({
         preserveModules: false,
         globals: {
           vite: "Vite",
+          fs: "fs",
+          path: "path",
         },
       },
     },

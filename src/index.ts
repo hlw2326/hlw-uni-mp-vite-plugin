@@ -2,53 +2,58 @@
  * hlw-uni Vite Plugin
  * 环境变量注入 · SCSS 主题 · 全局 API 注入
  */
-import type { Plugin, UserConfig } from 'vite';
-import { applyEnvPlugin } from './env';
-import { applyThemePlugin } from './theme';
-import { getAutoImportConfig } from './auto-import';
+import type { Plugin, ResolvedConfig } from "vite";
+import { applyEnvPlugin } from "./env";
+import { applyThemePlugin } from "./theme";
+import { getAutoImportConfig } from "./auto-import";
+import { installEasycomInterceptor, createEasycomPlugin } from "./easycom";
 
 export interface HlwUniPluginOptions {
-  /** 主题色，注入为 SCSS $primary-color 变量 */
-  primaryColor?: string;
-  /** 手动指定 .env 文件读取目录 */
-  envDir?: string;
+    /** 主题色，注入为 SCSS $primary-color 变量 */
+    primaryColor?: string;
+    /** 手动指定 .env 文件读取目录 */
+    envDir?: string;
 }
 
-export default function hlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin {
-  const { primaryColor = '#3b82f6', envDir } = options;
+export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
+    // 在插件工厂执行阶段（vite.config.ts 解析时）立即安装拦截器
+    // 确保早于 uni-app 插件读取 pages.json
+    installEasycomInterceptor();
 
-  return {
-    name: 'hlw-uni-mp-vite-plugin',
+    const { primaryColor = "#3b82f6", envDir } = options;
 
-    config(userConfig, { mode }) {
-      const define = applyEnvPlugin(userConfig, { envDir }, mode);
+    const mainPlugin: Plugin = {
+        name: "hlw-uni-mp-vite-plugin",
 
-      return {
-        ...applyThemePlugin({ primaryColor }),
-        define,
-      };
-    },
+        config(userConfig, { mode }) {
+            const define = applyEnvPlugin(userConfig, { envDir }, mode);
 
-    configResolved(config: UserConfig) {
-      const hasAutoImport = config.plugins?.some(
-        (p) => (p as any).name === 'unplugin-auto-import',
-      );
-      if (hasAutoImport) return;
+            return {
+                ...applyThemePlugin({ primaryColor }),
+                define,
+            };
+        },
 
-      // CJS/ESM 兼容：动态获取 unplugin-auto-import
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const mod = require('unplugin-auto-import/vite');
-      const AutoImport = (mod as any).default ?? mod;
+        configResolved(config: ResolvedConfig) {
+            const hasAutoImport = config.plugins?.some((p) => (p as any).name === "unplugin-auto-import");
+            if (hasAutoImport) return;
 
-      config.plugins!.push(
-        AutoImport({
-          imports: getAutoImportConfig(),
-          vueTemplate: true,
-          dts: false,
-          dirs: [],
-          resolvers: [],
-        }),
-      );
-    },
-  };
+            // CJS/ESM 兼容：动态获取 unplugin-auto-import
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const mod = require("unplugin-auto-import/vite");
+            const AutoImport = (mod as any).default ?? mod;
+
+            (config.plugins as any[]).push(
+                AutoImport({
+                    imports: getAutoImportConfig(),
+                    vueTemplate: true,
+                    dts: false,
+                    dirs: [],
+                    resolvers: [],
+                }),
+            );
+        },
+    };
+
+    return [mainPlugin, createEasycomPlugin()];
 }
