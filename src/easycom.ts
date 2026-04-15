@@ -1,87 +1,59 @@
 /**
- * 拦截 fs.readFileSync，在内存中向 pages.json 注入 easycom 规则
- * 文件本身不会被修改
+ * 向 uni-app 的 easycom 系统注入 hlw 组件规则
  *
- * 注意：必须用 require('fs') 拿到 CJS module cache 里的可变对象，
- * import * as fs 会生成 ESM namespace（属性 non-configurable），无法被覆盖。
+ * 核心问题：@dcloudio/vite-plugin-uni 的 cli/action.js 在 runDev() 中
+ * 会在 build(vite.config.ts) 之前直接调用 initEasycomsOnce()，导致
+ * 我们在 vite.config.ts 里注册的插件无法通过 fs.readFileSync 拦截来注入规则。
+ *
+ * 解决方案：在 configResolved 钩子中，直接向 initEasycomsOnce() 返回值里
+ * 的 easycoms 数组（模块级引用）追加规则，无需 once 缓存失效。
  */
 import type { Plugin } from 'vite'
 
 const EASYCOM_KEY = '^hlw-(.*)'
+const EASYCOM_PATTERN = /^hlw-(.*)/
 const EASYCOM_VALUE = '@hlw-uni/mp-vue/src/components/hlw-$1/index.vue'
 
-let installed = false
-
-function normalizePath(p: string): string {
-    return String(p).replace(/\\/g, '/')
-}
-
-function injectRule(str: string): string | null {
-    let json: Record<string, any>
-    try {
-        json = JSON.parse(str)
-    } catch {
-        return null
-    }
-
-    if (json?.easycom?.custom?.[EASYCOM_KEY] === EASYCOM_VALUE) return null
-
-    json.easycom ??= { autoscan: true, custom: {} }
-    json.easycom.custom ??= {}
-    json.easycom.custom[EASYCOM_KEY] = EASYCOM_VALUE
-
-    return JSON.stringify(json)
-}
-
-/**
- * 尽早调用（插件工厂函数执行时），确保在 uni 读取 pages.json 之前生效
- */
-export function installEasycomInterceptor(): void {
-    if (installed) return
-    installed = true
-
-    // 用 require 获取 CJS module cache 中的可变 fs 对象
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs') as typeof import('fs')
-    const original = fs.readFileSync.bind(fs)
-
-    fs.readFileSync = function patchedReadFileSync(path: any, options?: any): any {
-        const result = original(path, options)
-
-        if (!normalizePath(path).endsWith('/src/pages.json')) return result
-
-        try {
-            const str = Buffer.isBuffer(result) ? result.toString('utf-8') : String(result)
-            const modified = injectRule(str)
-            if (!modified) return result
-            return Buffer.isBuffer(result) ? Buffer.from(modified) : modified
-        } catch {
-            return result
-        }
-    } as typeof fs.readFileSync
-}
-
-/** load 钩子作为补充（覆盖 Vite 模块系统路径） */
+/** 在 configResolved 钩子中直接向 easycoms 数组注入规则 */
 export function createEasycomPlugin(): Plugin {
     return {
         name: 'hlw-uni-easycom',
         enforce: 'pre',
 
-        load(id) {
-            const normalizedId = normalizePath(id).split('?')[0]
-            if (!normalizedId.endsWith('/src/pages.json')) return null
-
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const fs = require('fs') as typeof import('fs')
-            let raw: string
+        configResolved() {
             try {
-                raw = fs.readFileSync(normalizedId, 'utf-8') as string
-            } catch {
-                return null
-            }
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                const cliShared = require('@dcloudio/uni-cli-shared') as any
+                if (typeof cliShared?.initEasycomsOnce !== 'function') return
 
-            const modified = injectRule(raw)
-            return modified ?? raw
+                // initEasycomsOnce 已在 cli/action.js 中被调用并缓存，
+                // 此处调用返回缓存的 res 对象（含模块级 easycoms 数组引用）
+                const result = cliShared.initEasycomsOnce(
+                    process.env.UNI_INPUT_DIR,
+                    {
+                        dirs: [],
+                        platform: process.env.UNI_PLATFORM || 'mp-weixin',
+                        isX: false,
+                    }
+                )
+
+                const easycoms: any[] = result?.easycoms
+                if (!Array.isArray(easycoms)) return
+
+                // 避免重复注入
+                const alreadyExists = easycoms.some(
+                    (e) => e?.pattern?.toString() === EASYCOM_PATTERN.toString()
+                )
+                if (alreadyExists) return
+
+                easycoms.push({
+                    name: EASYCOM_KEY,
+                    pattern: EASYCOM_PATTERN,
+                    replacement: EASYCOM_VALUE,
+                })
+            } catch {
+                // 容错：非 uni-app 环境下忽略
+            }
         },
     }
 }
