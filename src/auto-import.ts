@@ -24,6 +24,7 @@ export function getAutoImportConfig() {
         'http',
         'getPinia',
         'useApp',
+        'copyToClipboard',
       ],
     },
   ];

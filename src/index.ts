@@ -1,12 +1,13 @@
 /**
  * hlw-uni Vite Plugin
- * 环境变量注入 · SCSS 主题 · 全局 API 注入 · easycom 自动注入
+ * 环境变量注入 · SCSS 主题 · 全局 API 注入 · easycom 自动注入 · v-copy 编译转换
  */
 import type { Plugin, ResolvedConfig } from "vite";
 import { applyEnvPlugin } from "./env";
 import { applyThemePlugin } from "./theme";
 import { getAutoImportConfig } from "./auto-import";
 import { createEasycomPlugin } from "./easycom";
+import { createCopyTransformPlugin } from "./copy-transform";
 
 export interface HlwUniPluginOptions {
     /** 主题色，注入为 SCSS $primary-color 变量 */
@@ -51,5 +52,5 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
         },
     };
 
-    return [mainPlugin, createEasycomPlugin()];
+    return [createCopyTransformPlugin(), mainPlugin, createEasycomPlugin()];
 }
