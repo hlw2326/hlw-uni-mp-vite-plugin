@@ -4,20 +4,17 @@
  */
 import type { Plugin, ResolvedConfig } from "vite";
 import { applyEnvPlugin } from "./env";
-import { applyThemePlugin } from "./theme";
 import { getAutoImportConfig } from "./auto-import";
 import { createEasycomPlugin } from "./easycom";
 import { createCopyTransformPlugin } from "./copy-transform";
 
 export interface HlwUniPluginOptions {
-    /** 主题色，注入为 SCSS $primary-color 变量 */
-    primaryColor?: string;
     /** 手动指定 .env 文件读取目录 */
     envDir?: string;
 }
 
 export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
-    const { primaryColor = "#3b82f6", envDir } = options;
+    const { envDir } = options;
 
     const mainPlugin: Plugin = {
         name: "hlw-uni-mp-vite-plugin",
@@ -25,10 +22,7 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
         config(userConfig, { mode }) {
             const define = applyEnvPlugin(userConfig, { envDir }, mode);
 
-            return {
-                ...applyThemePlugin({ primaryColor }),
-                define,
-            };
+            return { define };
         },
 
         configResolved(config: ResolvedConfig) {
