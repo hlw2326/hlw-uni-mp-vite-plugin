@@ -8,7 +8,23 @@ export interface AutoImportOptions {
 
 export function getAutoImportConfig() {
   return [
-    { 'vue': ['ref', 'computed', 'reactive', 'onMounted', 'onShow', 'onLoad'] },
+    { vue: ['ref', 'computed', 'reactive', 'watch', 'watchEffect', 'nextTick', 'onMounted', 'onUnmounted', 'toRef', 'toRefs'] },
+    {
+      '@dcloudio/uni-app': [
+        'onShow',
+        'onHide',
+        'onLoad',
+        'onReady',
+        'onUnload',
+        'onPullDownRefresh',
+        'onReachBottom',
+        'onShareAppMessage',
+        'onPageScroll',
+        'onTabItemTap',
+        'onLaunch',
+        'onError',
+      ],
+    },
     {
       '@hlw-uni/mp-core': [
         'useLoading',
@@ -24,7 +40,6 @@ export function getAutoImportConfig() {
         'http',
         'getPinia',
         'useApp',
-        'copyToClipboard',
       ],
     },
   ];
