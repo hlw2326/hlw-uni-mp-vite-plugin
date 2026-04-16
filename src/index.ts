@@ -44,7 +44,7 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
                 AutoImport({
                     imports: getAutoImportConfig(),
                     vueTemplate: true,
-                    dts: 'src/auto-imports.d.ts',
+                    dts: 'src/imports.d.ts',
                     dirs: [],
                     resolvers: [],
                 }),
