@@ -20,27 +20,6 @@ export interface HlwUniPluginOptions {
     easycomReplacement?: string;
 }
 
-function flattenPluginOptions(plugins: PluginOption[] = []): Plugin[] {
-    const result: Plugin[] = [];
-
-    for (const plugin of plugins) {
-        if (!plugin) continue;
-        if (Array.isArray(plugin)) {
-            result.push(...flattenPluginOptions(plugin));
-            continue;
-        }
-        if (typeof plugin === "object" && "name" in plugin) {
-            result.push(plugin as Plugin);
-        }
-    }
-
-    return result;
-}
-
-function hasPluginByName(plugins: PluginOption[] = [], name: string): boolean {
-    return flattenPluginOptions(plugins).some((plugin) => plugin.name === name);
-}
-
 export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
     const {
         envDir,
@@ -54,19 +33,7 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
 
         config(userConfig: UserConfig, { mode }: ConfigEnv) {
             const define = applyEnvPlugin(userConfig, { envDir }, mode);
-            const plugins: Plugin[] = [];
-
-            if (autoImport && !hasPluginByName(userConfig.plugins ?? [], "unplugin-auto-import")) {
-                plugins.push(
-                    AutoImport({
-                        imports: getAutoImportConfig(),
-                        vueTemplate: true,
-                        dts: autoImportDts,
-                    }),
-                );
-            }
-
-            return { define, plugins };
+            return { define };
         },
 
         configResolved(_config: ResolvedConfig) {
@@ -76,7 +43,14 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
 
     return [
         createCopyTransformPlugin(),
+        autoImport
+            ? (AutoImport({
+                  imports: getAutoImportConfig(),
+                  vueTemplate: true,
+                  dts: autoImportDts,
+              }) as Plugin)
+            : null,
         mainPlugin,
         createEasycomPlugin({ replacement: easycomReplacement }),
-    ];
+    ].filter(Boolean) as Plugin[];
 }
