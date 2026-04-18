@@ -44,6 +44,7 @@ export default defineConfig({
           vite: "Vite",
           fs: "fs",
           path: "path",
+          "unplugin-auto-import/vite": "AutoImport",
         },
       },
     },

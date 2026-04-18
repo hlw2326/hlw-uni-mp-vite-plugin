@@ -1,50 +1,82 @@
 /**
  * hlw-uni Vite Plugin
- * 环境变量注入 · SCSS 主题 · 全局 API 注入 · easycom 自动注入 · v-copy 编译转换
+ * 提供环境变量注入、auto-import、easycom 规则注入和 v-copy 编译转换。
  */
-import type { Plugin, ResolvedConfig } from "vite";
+import AutoImport from "unplugin-auto-import/vite";
+import type { Plugin, PluginOption, ResolvedConfig, UserConfig, ConfigEnv } from "vite";
 import { applyEnvPlugin } from "./env";
 import { getAutoImportConfig } from "./auto-import";
-import { createEasycomPlugin } from "./easycom";
+import { createEasycomPlugin, DEFAULT_EASYCOM_REPLACEMENT } from "./easycom";
 import { createCopyTransformPlugin } from "./copy-transform";
 
 export interface HlwUniPluginOptions {
     /** 手动指定 .env 文件读取目录 */
     envDir?: string;
+    /** 是否启用 auto-import，默认启用 */
+    autoImport?: boolean;
+    /** auto-import 生成的 dts 文件路径 */
+    autoImportDts?: string;
+    /** easycom 组件解析路径，默认指向 @hlw-uni/mp-vue 组件源码 */
+    easycomReplacement?: string;
+}
+
+function flattenPluginOptions(plugins: PluginOption[] = []): Plugin[] {
+    const result: Plugin[] = [];
+
+    for (const plugin of plugins) {
+        if (!plugin) continue;
+        if (Array.isArray(plugin)) {
+            result.push(...flattenPluginOptions(plugin));
+            continue;
+        }
+        if (typeof plugin === "object" && "name" in plugin) {
+            result.push(plugin as Plugin);
+        }
+    }
+
+    return result;
+}
+
+function hasPluginByName(plugins: PluginOption[] = [], name: string): boolean {
+    return flattenPluginOptions(plugins).some((plugin) => plugin.name === name);
 }
 
 export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
-    const { envDir } = options;
+    const {
+        envDir,
+        autoImport = true,
+        autoImportDts = "src/imports.d.ts",
+        easycomReplacement = DEFAULT_EASYCOM_REPLACEMENT,
+    } = options;
 
     const mainPlugin: Plugin = {
         name: "hlw-uni-mp-vite-plugin",
 
-        config(userConfig, { mode }) {
+        config(userConfig: UserConfig, { mode }: ConfigEnv) {
             const define = applyEnvPlugin(userConfig, { envDir }, mode);
+            const plugins: Plugin[] = [];
 
-            return { define };
+            if (autoImport && !hasPluginByName(userConfig.plugins ?? [], "unplugin-auto-import")) {
+                plugins.push(
+                    AutoImport({
+                        imports: getAutoImportConfig(),
+                        vueTemplate: true,
+                        dts: autoImportDts,
+                    }),
+                );
+            }
+
+            return { define, plugins };
         },
 
-        configResolved(config: ResolvedConfig) {
-            const hasAutoImport = config.plugins?.some((p) => (p as any).name === "unplugin-auto-import");
-            if (hasAutoImport) return;
-
-            // CJS/ESM 兼容：动态获取 unplugin-auto-import
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const mod = require("unplugin-auto-import/vite");
-            const AutoImport = (mod as any).default ?? mod;
-
-            (config.plugins as any[]).push(
-                AutoImport({
-                    imports: getAutoImportConfig(),
-                    vueTemplate: true,
-                    dts: 'src/imports.d.ts',
-                    dirs: [],
-                    resolvers: [],
-                }),
-            );
+        configResolved(_config: ResolvedConfig) {
+            // 预留给后续需要读取最终配置时扩展。
         },
     };
 
-    return [createCopyTransformPlugin(), mainPlugin, createEasycomPlugin()];
+    return [
+        createCopyTransformPlugin(),
+        mainPlugin,
+        createEasycomPlugin({ replacement: easycomReplacement }),
+    ];
 }
