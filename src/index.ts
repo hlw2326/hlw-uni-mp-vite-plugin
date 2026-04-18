@@ -2,8 +2,8 @@
  * hlw-uni Vite Plugin
  * 提供环境变量注入、auto-import、easycom 规则注入和 v-copy 编译转换。
  */
-import AutoImport from "unplugin-auto-import/vite";
-import type { Plugin, PluginOption, ResolvedConfig, UserConfig, ConfigEnv } from "vite";
+import * as AutoImportModule from "unplugin-auto-import/vite";
+import type { Plugin, ResolvedConfig, UserConfig, ConfigEnv } from "vite";
 import { applyEnvPlugin } from "./env";
 import { getAutoImportConfig } from "./auto-import";
 import { createEasycomPlugin, DEFAULT_EASYCOM_REPLACEMENT } from "./easycom";
@@ -20,6 +20,21 @@ export interface HlwUniPluginOptions {
     easycomReplacement?: string;
 }
 
+function resolveAutoImportFactory() {
+    const moduleValue = AutoImportModule as { default?: unknown };
+    const candidate = moduleValue.default && typeof moduleValue.default === "object"
+        ? (moduleValue.default as { default?: unknown }).default ?? moduleValue.default
+        : moduleValue.default ?? AutoImportModule;
+    if (typeof candidate !== "function") {
+        throw new TypeError("Failed to resolve unplugin-auto-import/vite factory");
+    }
+    return candidate as (options: {
+        imports: ReturnType<typeof getAutoImportConfig>;
+        vueTemplate: boolean;
+        dts: string;
+    }) => Plugin;
+}
+
 export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
     const {
         envDir,
@@ -27,6 +42,7 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
         autoImportDts = "src/imports.d.ts",
         easycomReplacement = DEFAULT_EASYCOM_REPLACEMENT,
     } = options;
+    const createAutoImport = resolveAutoImportFactory();
 
     const mainPlugin: Plugin = {
         name: "hlw-uni-mp-vite-plugin",
@@ -44,11 +60,11 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
     return [
         createCopyTransformPlugin(),
         autoImport
-            ? (AutoImport({
+            ? createAutoImport({
                   imports: getAutoImportConfig(),
                   vueTemplate: true,
                   dts: autoImportDts,
-              }) as Plugin)
+              })
             : null,
         mainPlugin,
         createEasycomPlugin({ replacement: easycomReplacement }),

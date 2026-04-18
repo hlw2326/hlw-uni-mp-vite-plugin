@@ -21,7 +21,7 @@ export default defineConfig({
       entry: {
         index: "./src/index.ts",
       },
-      name: "HlwUniPlugin",
+      formats: ["es", "cjs"],
       fileName: (format) => `index.${format === "es" ? "mjs" : "js"}`,
     },
     rollupOptions: {
