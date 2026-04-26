@@ -34,18 +34,16 @@ export function getAutoImportConfig(): Array<Record<string, string[]>> {
       ],
     },
     {
-      "@hlw-uni/mp-core": [
+      "@hlw-uni/mp-vue": [
         "useLoading",
         "useMsg",
         "useRefs",
         "useDevice",
         "usePageMeta",
-        "useRequest",
-        "useUpload",
         "hlw",
         "http",
         "useApp",
-        "setupDefaultInterceptors",
+        "setupInterceptors",
       ],
     },
   ];

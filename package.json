@@ -1,6 +1,6 @@
 {
     "name": "@hlw-uni/mp-vite-plugin",
-    "version": "1.0.30",
+    "version": "1.0.32",
     "description": "UniApp Vite 编译插件 — 环境变量注入、SCSS 主题、Auto-Import、全局 API 注入",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -22,7 +22,7 @@
     },
     "peerDependencies": {
         "@dcloudio/vite-plugin-uni": ">=3.0.0",
-        "@hlw-uni/mp-core": ">=1.0.10",
+        "@hlw-uni/mp-vue": ">=2.0.0",
         "vite": ">=5.0.0"
     },
     "dependencies": {
