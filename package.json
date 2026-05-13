@@ -18,6 +18,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite build --watch",
+        "test": "node tests/theme-page-meta.test.mjs",
         "publish:npm": "pnpm build && npm publish --access public"
     },
     "peerDependencies": {

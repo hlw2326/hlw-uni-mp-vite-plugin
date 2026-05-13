@@ -82,14 +82,14 @@ VITE_API_BASE_URL=https://api.example.com/api
 
 ## v-copy 编译转换
 
-插件会在编译阶段把模板中的 `v-copy` 转换成 `data-copy + @tap` 形式：
+插件会在编译阶段把模板中的 `v-copy` 转换成 `@tap` 调用：
 
 ```vue
 <view v-copy="userId" />
 <view v-copy.silent="'88329104'" />
 ```
 
-这依赖 `hlw.$utils.copyFromEvent`，因此需要在运行时正确注入 `hlw`：
+这依赖 `hlw.$utils.copy`，因此需要在运行时正确注入 `hlw`：
 
 ```ts
 app.config.globalProperties["hlw"] = hlw;
