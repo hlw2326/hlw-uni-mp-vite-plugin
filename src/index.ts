@@ -9,6 +9,7 @@ import { getAutoImportConfig } from "./auto-import";
 import { createEasycomPlugin, DEFAULT_EASYCOM_REPLACEMENT } from "./easycom";
 import { createCopyTransformPlugin } from "./copy-transform";
 import { createThemePageMetaPlugin } from "./theme-page-meta";
+import { createDirectiveInjectPlugin } from "./directive-inject";
 
 export interface HlwUniPluginOptions {
     /** 手动指定 .env 文件读取目录 */
@@ -63,6 +64,7 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
 
     return [
         createCopyTransformPlugin(),
+        createDirectiveInjectPlugin(),
         themePageMeta ? createThemePageMetaPlugin() : null,
         autoImport
             ? createAutoImport({
