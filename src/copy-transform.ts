@@ -9,7 +9,7 @@ const V_COPY_RE = /\bv-copy((?:\.\w+)*)="([^"]*)"/g;
 
 function toTap(expr: string, silent: boolean) {
     const showToast = silent ? "false" : "true";
-    return `@tap="() => hlw.$utils.copy(String((${expr}) ?? ''), ${showToast})"`;
+    return `@tap="() => uni.setClipboardData({ data: String((${expr}) ?? ''), showToast: false, success: () => ${showToast} ? uni.showToast({ title: '复制成功', icon: 'none', duration: 1500 }) : undefined })"`;
 }
 
 export function createCopyTransformPlugin(): Plugin {
