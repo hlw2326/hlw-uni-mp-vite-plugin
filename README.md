@@ -1,103 +1,131 @@
 # @hlw-uni/mp-vite-plugin
 
-`@hlw-uni/mp-vite-plugin` 是一组面向 UniApp 的 Vite 辅助能力，当前提供：
+<p align="center">
+  <img src="https://img.shields.io/badge/vite-5.x-blue.svg" alt="Vite 5">
+  <img src="https://img.shields.io/badge/typescript-supported-blue.svg" alt="TypeScript">
+  <img src="https://img.shields.io/badge/platform-uni--app-red.svg" alt="uni-app">
+</p>
 
-- `VITE_*` 环境变量注入
-- Vue / UniApp / `@hlw-uni/mp-core` 常用 API 自动导入
-- `hlw-*` 组件 easycom 规则注入
-- `v-copy` 指令模板编译转换
+> **hlw-uni 小程序打包与开发编译专用的 Vite 辅助插件**  
+> 提供多端小程序环境变量的安全注入、核心 API 自动按需导入（Auto-import）、easycom 自动按需注册以及 `v-copy` 模版静态事件转译等核心构建能力。
 
-运行时能力如 HTTP、消息提示、设备信息等由 `@hlw-uni/mp-core` 提供。
+---
 
-## 安装
+## ✨ 核心特性
+
+- 🌍 **安全的环境变量注入** — 自动读取 `.env` 等文件，将以 `VITE_` 开头的变量安全地注入到 `import.meta.env.*` 中。
+- ⚡ **无感式 API 自动导入** — 针对 `vue`、`@dcloudio/uni-app` 与 `@hlw-uni/mp-vue` 的真高频 API 提供自动按需导入，极大精简业务代码中的 `import` 噪音。
+- 🧩 **easycom 规则注入** — 自动为 `hlw-*` UI 组件生成 easycom 组件映射配置，免去开发者手动编辑配置文件的烦恼。
+- 📋 **v-copy 编译期零成本转译** — 静态解析模版中的 `v-copy` 指令并直译为原生的 `@tap` 微信小程序剪贴板事件，消除运行期 directive 的性能负担，同时在主入口自动注入指令注册进行安全兜底。
+
+---
+
+## 📦 安装
+
+在包含 Vite 编译流的小程序项目根目录中进行安装：
 
 ```bash
-npm install @hlw-uni/mp-vite-plugin
+pnpm add -D @hlw-uni/mp-vite-plugin
 ```
 
-## 配置
+---
+
+## 🔧 快速启用配置
+
+在项目根目录下的 `vite.config.ts` 中注册并配置插件：
 
 ```ts
 import { defineConfig } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
-import hlwUni from "@hlw-uni/mp-vite-plugin";
+import HlwUni from "@hlw-uni/mp-vite-plugin";
 
-export default defineConfig({
-  plugins: [
-    uni(),
-    hlwUni(),
-  ],
+export default defineConfig(async () => {
+    return {
+        plugins: [
+            uni(),
+            // 启用 hlw-uni 辅助构建插件
+            HlwUni({ 
+                autoImport: true 
+            }),
+        ],
+    };
 });
 ```
 
-## 选项
+---
 
-| 选项 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `envDir` | `string` | 项目根目录 | 手动指定 `.env` 文件读取目录 |
-| `autoImport` | `boolean` | `true` | 是否启用自动导入 |
-| `autoImportDts` | `string` | `src/imports.d.ts` | 自动导入声明文件输出路径 |
-| `easycomReplacement` | `string` | `@hlw-uni/mp-vue/src/components/hlw-$1/index.vue` | easycom 组件解析目标路径 |
+## ⚙️ 插件可选参数
 
-## 环境变量注入
+| 参数名 | 类型 | 默认值 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `envDir` | `string` | 项目根目录 | 手动指定 `.env`、`.env.development` 等环境文件的读取目录 |
+| `autoImport` | `boolean` | `true` | 是否启用高频 API 自动导入 |
+| `autoImportDts` | `string` | `"src/imports.d.ts"` | 自动导入生成的 TypeScript `.d.ts` 类型声明文件输出路径 |
+| `easycomReplacement` | `string` | `"@hlw-uni/mp-vue/src/components/hlw-$1/index.vue"` | 自定义 UI 组件映射定位的相对/绝对路径 |
 
-插件会读取项目中的 `.env`、`.env.local`、`.env.{mode}`、`.env.{mode}.local` 文件，并把所有以 `VITE_` 开头的变量注入为 `import.meta.env.*`。
+---
 
-```bash
-# .env.development
-VITE_API_BASE_URL=http://localhost:3000/api
+## 🛠️ 模块详解
 
-# .env.production
-VITE_API_BASE_URL=https://api.example.com/api
-```
+### 1. v-copy 点击复制模版直译机制 (`copy-transform`)
 
-## Auto-Import
+插件在 `enforce: "pre"` 阶段拦截 `.vue` 组件的读取。当在模版中检测到 `v-copy` 点击复制语法糖时，会直接在编译阶段将其静态替换为无外部依赖的小程序原生点击监听。
 
-默认会自动导入以下 API：
+* **转译对比**：
+  * **输入**：
+    ```vue
+    <view v-copy="userId" class="copy-btn">复制ID</view>
+    <view v-copy.silent="'10086'">静默复制</view>
+    ```
+  * **输出**：
+    ```vue
+    <view @tap="() => uni.setClipboardData({ data: String((userId) ?? ''), showToast: false, success: () => true ? uni.showToast({ title: '复制成功', icon: 'none', duration: 1500 }) : undefined })" class="copy-btn">复制ID</view>
+    <view @tap="() => uni.setClipboardData({ data: String(('10086') ?? ''), showToast: false, success: () => false ? uni.showToast({ title: '复制成功', icon: 'none', duration: 1500 }) : undefined })">静默复制</view>
+    ```
+* **运行时指令自动挂载（`directive-inject`）**：
+  为了彻底阻断开发时的警告并提供动态兜底能力，插件还会自动扫描 `main.ts` 入口文件，在初始化阶段为应用实例动态注入运行时指令定义，确保 Vue 运行时稳定不报错：
+  ```ts
+  import { vCopy } from "@hlw-uni/mp-vue";
+  app.directive("copy", vCopy);
+  ```
 
-| 来源 | 自动导入 |
-|------|---------|
-| `vue` | `ref`、`computed`、`reactive`、`watch`、`watchEffect`、`nextTick`、`onMounted`、`onUnmounted`、`toRef`、`toRefs` |
-| `@dcloudio/uni-app` | `onShow`、`onHide`、`onLoad`、`onReady`、`onUnload`、`onPullDownRefresh`、`onReachBottom`、`onShareAppMessage`、`onPageScroll`、`onTabItemTap`、`onLaunch`、`onError` |
-| `@hlw-uni/mp-core` | `useLoading`、`useMsg`、`useRefs`、`useDevice`、`usePageMeta`、`useRequest`、`useUpload`、`hlw`、`http`、`useApp`、`setupDefaultInterceptors` |
+### 2. 真高频 API 自动导入 (`auto-import`)
 
-如果项目里已经手动注册了 `unplugin-auto-import`，本插件不会重复注入。
+当 `autoImport` 选项开启时，插件会为项目自动注入以下高频使用的核心 API：
 
-## Easycom
+| 来源库 | 自动按需导入的 API 列表 |
+| :--- | :--- |
+| **`vue`** | `ref`, `computed`, `reactive`, `watch`, `onMounted` |
+| **`@dcloudio/uni-app`** | `onShow`, `onHide`, `onLaunch`, `onShareAppMessage`, `onShareTimeline` |
+| **`@hlw-uni/mp-vue`** | `hlw`, `http`, `useMsg` |
 
-插件会向 uni-app 的 easycom 系统注入 `hlw-*` 组件规则，例如：
+> [!NOTE]
+> 插件采用了高度精简的导入清单，只列入最高频的开发函数，以规避过多 API 被滥用导致 IDE 类型系统噪音与混乱。若需使用其他非高频函数，请在业务代码中正常显式 `import`。
 
-```vue
-<hlw-button />
-<hlw-popup />
-```
+### 3. easycom 组件定位自动发现 (`easycom`)
 
-默认解析到：
+插件会在项目配置初始化时自动与 uni-app easycom 机制结合，拦截带有 `hlw-` 前缀的 UI 组件。将它们路由至如下路径进行解析和热重构，开发者在编写页面时可以直接使用组件，免除了一切手动 `import` 的步骤：
 
 ```ts
 @hlw-uni/mp-vue/src/components/hlw-$1/index.vue
 ```
 
-如果你的组件实际发布路径不同，可以通过 `easycomReplacement` 覆盖。
+---
 
-## v-copy 编译转换
+## 💻 插件本地开发
 
-插件会在编译阶段把模板中的 `v-copy` 转换成 `@tap` 调用：
-
-```vue
-<view v-copy="userId" />
-<view v-copy.silent="'88329104'" />
-```
-
-这依赖 `hlw.$utils.copy`，因此需要在运行时正确注入 `hlw`：
-
-```ts
-app.config.globalProperties["hlw"] = hlw;
-```
-
-## 构建
+对本 Vite 插件进行功能增强、更新或修补时，可采用如下构建指令：
 
 ```bash
-npm run build
-npm run dev
+# 1. 启动监听式自动打包编译 (开发模式)
+pnpm dev
+
+# 2. 生成带完备 SourceMap 与 TS 类型定义的生产包
+pnpm build
 ```
+
+---
+
+## 📄 许可协议
+
+本插件为**内部私有开发工具**，仅可用于 `hlw-uni` 对应关联小程序项目的打包构建，严禁向外部公开分发或上传至公共 NPM 仓库。
