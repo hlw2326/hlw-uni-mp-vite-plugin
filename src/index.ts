@@ -8,7 +8,6 @@ import { applyEnvPlugin } from "./env";
 import { getAutoImportConfig } from "./auto-import";
 import { createEasycomPlugin, DEFAULT_EASYCOM_REPLACEMENT } from "./easycom";
 import { createCopyTransformPlugin } from "./copy-transform";
-import { createThemePageMetaPlugin } from "./theme-page-meta";
 import { createDirectiveInjectPlugin } from "./directive-inject";
 
 export interface HlwUniPluginOptions {
@@ -16,10 +15,8 @@ export interface HlwUniPluginOptions {
     envDir?: string;
     /** 是否启用 auto-import，默认启用 */
     autoImport?: boolean;
-    /** auto-import 生成的 dts 文件路径 */
+    /** auto-import 生成 of dts 文件路径 */
     autoImportDts?: string;
-    /** 是否为 pages.json 页面自动注入主题 page-meta，默认关闭 */
-    themePageMeta?: boolean;
     /** easycom 组件解析路径，默认指向 @hlw-uni/mp-vue 组件源码 */
     easycomReplacement?: string;
 }
@@ -44,7 +41,6 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
         envDir,
         autoImport = true,
         autoImportDts = "src/imports.d.ts",
-        themePageMeta = false,
         easycomReplacement = DEFAULT_EASYCOM_REPLACEMENT,
     } = options;
     const createAutoImport = resolveAutoImportFactory();
@@ -65,7 +61,6 @@ export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[
     return [
         createCopyTransformPlugin(),
         createDirectiveInjectPlugin(),
-        themePageMeta ? createThemePageMetaPlugin() : null,
         autoImport
             ? createAutoImport({
                   imports: getAutoImportConfig(),
