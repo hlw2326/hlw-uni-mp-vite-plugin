@@ -7,9 +7,35 @@ import type { Plugin } from 'vite'
 export function getAutoImportConfig() {
 	return [
 		{ vue: ['ref', 'computed', 'reactive', 'watch', 'onMounted'] },
-		{ '@dcloudio/uni-app': ['onShow', 'onHide', 'onLaunch', 'onShareAppMessage', 'onShareTimeline'] },
-		{ '@hlw-uni-mp/use': ['useTheme', 'useRefs'] },
-		{ '@hlw-uni-mp/utils': ['hlw', 'useMsg', 'toast', 'modal', 'navigateTo', 'redirectTo', 'switchTab', 'reLaunch', 'navigateBack', 'copy', 'paste', 'formatConvertNumber', 'formatNumber', 'checkAppUpdate'] },
+		{ '@dcloudio/uni-app': ['onShow', 'onHide', 'onLaunch', 'onShareAppMessage', 'onShareTimeline', 'onPullDownRefresh', 'onReachBottom'] },
+		{ '@hlw-uni-mp/use': ['useTheme', 'useRefs', 'useShare', 'usePaging'] },
+		{
+			'@hlw-uni-mp/utils': [
+				'hlw',
+				'useMsg',
+				'toast',
+				'modal',
+				'navigateTo',
+				'redirectTo',
+				'switchTab',
+				'reLaunch',
+				'navigateBack',
+				'copy',
+				'paste',
+				'formatConvertNumber',
+				'formatNumber',
+				'formatNum',
+				'safeDecode',
+				'isPageMatch',
+				'getTodayStr',
+				'parseDate',
+				'isTimeInRange',
+				'formatDate',
+				'parseScene',
+				'getLaunchQuery',
+				'checkAppUpdate'
+			]
+		},
 		{ '@hlw-uni-mp/request': ['http', 'get', 'post', 'put', 'del', 'request'] }
 	]
 }
