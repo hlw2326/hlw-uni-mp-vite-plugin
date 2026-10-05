@@ -1,43 +1,33 @@
 {
-    "name": "@hlw-uni/mp-vite-plugin",
-    "version": "1.0.51",
-    "description": "UniApp Vite 编译插件 — 环境变量注入、SCSS 主题、Auto-Import、全局 API 注入",
-    "main": "dist/index.js",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "exports": {
-        ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite build --watch",
-        "test": "node tests/theme-page-meta.test.mjs",
-        "publish:npm": "pnpm build && npm publish --access public"
-    },
-    "peerDependencies": {
-        "@dcloudio/vite-plugin-uni": ">=3.0.0",
-        "@hlw-uni/mp-vue": ">=2.0.0",
-        "vite": ">=5.0.0"
-    },
-    "dependencies": {
-        "@antfu/utils": "^0.7.7",
-        "unplugin-auto-import": "^0.17.5"
-    },
-    "devDependencies": {
-        "@dcloudio/types": "^3.4.8",
-        "@dcloudio/vite-plugin-uni": "3.0.0-4080420251103001",
-        "@hlw-uni/mp-core": "1.0.10",
-        "@types/node": "^20.11.0",
-        "typescript": "^4.9.4",
-        "vite": "5.2.8",
-        "vite-plugin-dts": "^4.5.4",
-        "@vitejs/plugin-vue": "^5.1.0"
+  "name": "@hlw-uni-mp/vite-plugin",
+  "version": "1.0.8",
+  "description": "HLW Vite Plugin for auto app environment variables and type definitions",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3",
+    "vite": "^5.2.8"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "unplugin-auto-import": "^0.17.5"
+  }
 }

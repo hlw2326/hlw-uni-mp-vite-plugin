@@ -1,74 +1,89 @@
+import fs from 'fs'
+import path from 'path'
+import type { Plugin, ConfigEnv } from 'vite'
+import { loadEnv, toCode, genDts, writeDts } from './env'
+import { createCopyTransformPlugin } from './copy'
+import { createEasycomPlugin } from './easycom'
+import { createAutoImportPlugin } from './auto-import'
+import { createMpShimPlugin } from './shim'
+
 /**
- * hlw-uni Vite Plugin
- * 提供环境变量注入、auto-import、easycom 规则注入和 v-copy 编译转换。
+ * 插件配置项
  */
-import * as AutoImportModule from "unplugin-auto-import/vite";
-import type { Plugin, ResolvedConfig, UserConfig, ConfigEnv } from "vite";
-import { applyEnvPlugin } from "./env";
-import { getAutoImportConfig } from "./auto-import";
-import { createEasycomPlugin, DEFAULT_EASYCOM_REPLACEMENT } from "./easycom";
-import { createCopyTransformPlugin } from "./copy-transform";
-import { createDirectiveInjectPlugin } from "./directive-inject";
-
-export interface HlwUniPluginOptions {
-    /** 手动指定 .env 文件读取目录 */
-    envDir?: string;
-    /** 是否启用 auto-import，默认启用 */
-    autoImport?: boolean;
-    /** auto-import 生成 of dts 文件路径 */
-    autoImportDts?: string;
-    /** easycom 组件解析路径，默认指向 @hlw-uni/mp-vue 组件源码 */
-    easycomReplacement?: string;
+export interface PluginOptions {
+	/** 运行根目录 */
+	cwd?: string
+	/** 基础服务址 */
+	base?: string
+	/** 通讯服务址 */
+	wss?: string
+	/** 声明文件径 */
+	dts?: string
+	/** 开启自动入 */
+	autoImport?: boolean
+	/** 自动入声明 */
+	autoImportDts?: string
+	/** 组件替换规 */
+	easycomReplacement?: string
 }
 
-function resolveAutoImportFactory() {
-    const moduleValue = AutoImportModule as { default?: unknown };
-    const candidate = moduleValue.default && typeof moduleValue.default === "object"
-        ? (moduleValue.default as { default?: unknown }).default ?? moduleValue.default
-        : moduleValue.default ?? AutoImportModule;
-    if (typeof candidate !== "function") {
-        throw new TypeError("Failed to resolve unplugin-auto-import/vite factory");
-    }
-    return candidate as (options: {
-        imports: ReturnType<typeof getAutoImportConfig>;
-        vueTemplate: boolean;
-        dts: string;
-    }) => Plugin;
+/**
+ * 注入应用宏定义与环境变量插件
+ */
+function createDefinePlugin(options: PluginOptions = {}): Plugin {
+	return {
+		name: 'hlw-define',
+		config(_, { mode }: ConfigEnv) {
+			const root = options.cwd || process.cwd()
+			const envDict = loadEnv(mode, root)
+			const pkg = JSON.parse(fs.readFileSync(path.resolve(root, 'package.json'), 'utf-8'))
+
+			const versionName = (envDict.VITE_APP_VERSION || pkg.version) as string
+			const versionCode = toCode(versionName)
+			const baseUrl = options.base || envDict.VITE_BASE_URL
+			const wssUrl = options.wss || envDict.VITE_WSS_URL
+			const appName = (envDict.VITE_APP_NAME || pkg.name) as string
+			const appId = envDict.VITE_APPID
+
+			// 自动生成环境变量类型声明文件
+			writeDts(path.resolve(root, options.dts || 'src/types/host-env.d.ts'), genDts(envDict))
+
+			// 同步到当前 Node 进程
+			Object.assign(process.env, envDict)
+
+			const define: Record<string, string> = {
+				__APP_VERSION_CODE__: JSON.stringify(versionCode),
+				__APP_VERSION_NAME__: JSON.stringify(versionName),
+				__APP_BASE_URL__: JSON.stringify(baseUrl),
+				__APP_WSS_URL__: JSON.stringify(wssUrl),
+				__APP_NAME__: JSON.stringify(appName),
+				__APPID__: JSON.stringify(appId),
+				__HLW_ENV__: JSON.stringify(envDict),
+			}
+			for (const [key, value] of Object.entries(envDict)) {
+				if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)) {
+					define[`import.meta.env.${key}`] = JSON.stringify(value)
+				}
+			}
+			return { define }
+		}
+	}
 }
 
-export default function HlwUniPlugin(options: HlwUniPluginOptions = {}): Plugin[] {
-    const {
-        envDir,
-        autoImport = true,
-        autoImportDts = "src/imports.d.ts",
-        easycomReplacement = DEFAULT_EASYCOM_REPLACEMENT,
-    } = options;
-    const createAutoImport = resolveAutoImportFactory();
+/**
+ * 集成统一 Vite 插件
+ */
+export function hlwPlugin(options: PluginOptions = {}): Plugin[] {
+	const plugins: Plugin[] = [
+		createCopyTransformPlugin(),
+		createDefinePlugin(options),
+		createMpShimPlugin(),
+		createEasycomPlugin({ replacement: options.easycomReplacement })
+	]
 
-    const mainPlugin: Plugin = {
-        name: "hlw-uni-mp-vite-plugin",
+	if (options.autoImport) {
+		plugins.push(createAutoImportPlugin({ dts: options.autoImportDts }))
+	}
 
-        config(userConfig: UserConfig, { mode }: ConfigEnv) {
-            const define = applyEnvPlugin(userConfig, { envDir }, mode);
-            return { define };
-        },
-
-        configResolved(_config: ResolvedConfig) {
-            // 预留给后续需要读取最终配置时扩展。
-        },
-    };
-
-    return [
-        createCopyTransformPlugin(),
-        createDirectiveInjectPlugin(),
-        autoImport
-            ? createAutoImport({
-                  imports: getAutoImportConfig(),
-                  vueTemplate: true,
-                  dts: autoImportDts,
-              })
-            : null,
-        mainPlugin,
-        createEasycomPlugin({ replacement: easycomReplacement }),
-    ].filter(Boolean) as Plugin[];
+	return plugins
 }
