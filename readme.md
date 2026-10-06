@@ -58,6 +58,7 @@ export default defineConfig({
 | `autoImport` | `boolean` | `false` | 是否开启自动导入 |
 | `autoImportDts` | `string` | - | 自动导入类型声明文件路径 |
 | `easycomReplacement` | `string` | - | 自定义 Easycom 组件解析路径映射 |
+| `dropConsole` | `boolean` | `mode === 'production'` | 生产构建时自动清除 `console.log` 等调试日志 |
 
 ---
 

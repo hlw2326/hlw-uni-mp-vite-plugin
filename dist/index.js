@@ -243,7 +243,12 @@ function createDefinePlugin(options = {}) {
           define[`import.meta.env.${key}`] = JSON.stringify(value);
         }
       }
-      return { define };
+      const isProd = mode === "production";
+      const shouldDrop = options.dropConsole ?? isProd;
+      return {
+        define,
+        esbuild: shouldDrop ? { pure: ["console.log", "console.info", "console.debug"] } : void 0
+      };
     }
   };
 }

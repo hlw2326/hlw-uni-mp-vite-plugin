@@ -16,8 +16,10 @@ interface PluginOptions {
     autoImport?: boolean;
     /** 自动入声明 */
     autoImportDts?: string;
-    /** 组件替换规 */
+    /** 组件替换规则 */
     easycomReplacement?: string;
+    /** 生产环境构建时是否自动清除 console.log，默认 true */
+    dropConsole?: boolean;
 }
 /**
  * 集成统一 Vite 插件
