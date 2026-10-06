@@ -20,6 +20,8 @@ interface PluginOptions {
     easycomReplacement?: string;
     /** 生产环境构建时是否自动清除 console.log，默认 true */
     dropConsole?: boolean;
+    /** 是否输出构建产物体积概览统计，默认 true */
+    bundleStats?: boolean;
 }
 /**
  * 集成统一 Vite 插件

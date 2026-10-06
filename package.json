@@ -1,6 +1,6 @@
 {
   "name": "@hlw-uni-mp/vite-plugin",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "HLW Vite Plugin for auto app environment variables and type definitions",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

@@ -252,6 +252,22 @@ function createDefinePlugin(options = {}) {
     }
   };
 }
+function createBundleStatsPlugin() {
+  return {
+    name: "hlw-bundle-stats",
+    apply: "build",
+    generateBundle(_, bundle) {
+      const chunks = Object.values(bundle).filter((b) => b.type === "chunk");
+      let totalBytes = 0;
+      for (const chunk of chunks) {
+        const size = "code" in chunk ? Buffer.byteLength(chunk.code, "utf8") : 0;
+        totalBytes += size;
+      }
+      const totalKb = (totalBytes / 1024).toFixed(2);
+      console.log(`[hlw-vite] \u7F16\u8BD1\u4EA7\u7269\u5305\u4F53\u7EDF\u8BA1: \u5171\u6709 ${chunks.length} \u4E2A\u4EE3\u7801\u5206\u5757\uFF0C\u603B\u5927\u5C0F\u7EA6 ${totalKb} KB`);
+    }
+  };
+}
 function hlwPlugin(options = {}) {
   const plugins = [
     createCopyTransformPlugin(),
@@ -261,6 +277,9 @@ function hlwPlugin(options = {}) {
   ];
   if (options.autoImport) {
     plugins.push(createAutoImportPlugin({ dts: options.autoImportDts }));
+  }
+  if (options.bundleStats !== false) {
+    plugins.push(createBundleStatsPlugin());
   }
   return plugins;
 }

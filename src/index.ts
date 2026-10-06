@@ -27,6 +27,8 @@ export interface PluginOptions {
 	easycomReplacement?: string
 	/** 生产环境构建时是否自动清除 console.log，默认 true */
 	dropConsole?: boolean
+	/** 是否输出构建产物体积概览统计，默认 true */
+	bundleStats?: boolean
 }
 
 /**
@@ -81,6 +83,23 @@ function createDefinePlugin(options: PluginOptions = {}): Plugin {
 	}
 }
 
+function createBundleStatsPlugin(): Plugin {
+	return {
+		name: 'hlw-bundle-stats',
+		apply: 'build',
+		generateBundle(_, bundle) {
+			const chunks = Object.values(bundle).filter((b) => b.type === 'chunk')
+			let totalBytes = 0
+			for (const chunk of chunks) {
+				const size = 'code' in chunk ? Buffer.byteLength(chunk.code, 'utf8') : 0
+				totalBytes += size
+			}
+			const totalKb = (totalBytes / 1024).toFixed(2)
+			console.log(`[hlw-vite] 编译产物包体统计: 共有 ${chunks.length} 个代码分块，总大小约 ${totalKb} KB`)
+		}
+	}
+}
+
 /**
  * 集成统一 Vite 插件
  */
@@ -94,6 +113,10 @@ export function hlwPlugin(options: PluginOptions = {}): Plugin[] {
 
 	if (options.autoImport) {
 		plugins.push(createAutoImportPlugin({ dts: options.autoImportDts }))
+	}
+
+	if (options.bundleStats !== false) {
+		plugins.push(createBundleStatsPlugin())
 	}
 
 	return plugins
