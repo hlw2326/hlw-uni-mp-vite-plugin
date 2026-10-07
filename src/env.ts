@@ -70,6 +70,15 @@ ${camelLines}
 
 	type HostEnv = HostEnvMap & HostEnvCamelMap
 	type HostEnvKey = keyof HostEnvMap | keyof HostEnvCamelMap | string
+
+	interface ImportMetaEnv {
+${envLines}
+		[key: string]: any
+	}
+
+	interface ImportMeta {
+		readonly env: ImportMetaEnv
+	}
 }
 
 export type { HostEnvMap, HostEnvCamelMap, HostEnv, HostEnvKey }
