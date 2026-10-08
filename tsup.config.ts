@@ -7,6 +7,18 @@ export default defineConfig({
 	clean: true,
 	splitting: false,
 	sourcemap: false,
-	minify: false,
-	external: ['fs', 'path', 'vite', '@dcloudio/uni-cli-shared', 'unplugin-auto-import', /^unplugin-auto-import\/.*/]
+	external: [
+		'fs',
+		'path',
+		'vite',
+		'@dcloudio/uni-cli-shared',
+		'unplugin-auto-import',
+		/^unplugin-auto-import\/.*/,
+		'unocss',
+		/^unocss\/.*/,
+		'unocss-preset-weapp',
+		/^unocss-preset-weapp\/.*/,
+		/^@unocss\/.*/,
+		/^@iconify-json\/.*/
+	]
 })

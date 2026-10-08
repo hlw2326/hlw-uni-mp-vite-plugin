@@ -121,3 +121,5 @@ export function hlwPlugin(options: PluginOptions = {}): Plugin[] {
 
 	return plugins
 }
+
+export * from './unocss'

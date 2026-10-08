@@ -10,6 +10,7 @@
 - **类型声明自动生成**：启动/构建时自动生成 `src/types/host-env.d.ts`，赋予 `import.meta.env` 与全局宏完整的 TypeScript 类型提示。
 - **Easycom 自动挂载**：内置 `^hlw-(.*)` 组件匹配规则，无需在 `pages.json` 手动配置即可在模板中直接使用 `@hlw-uni-mp/vue` UI 组件。
 - **`v-copy` 编译期转换**：模板中的 `v-copy="text"` 指令在编译期自动转换为原生 `@tap` 与系统剪贴板调用，100% 零运行时侵入与体积开销。
+- **UnoCSS 极简门面模式**：导出 `defineHlwUnoConfig`，开箱自带微信小程序全套原子预设、字号变量、色彩体系、全局 `.container` 与常用图标 Safelist，业务项目 2 行代码即可接入并支持深度覆盖。
 - **极速轻量**：纯净无外部冗余依赖，构建打包秒级完成。
 
 ---
@@ -42,6 +43,24 @@ export default defineConfig({
         }),
         uni(),
     ],
+});
+```
+
+### UnoCSS 极简配置使用 (`unocss.config.ts`)
+
+在项目根目录创建 `unocss.config.ts`，只需调用 `defineUnoConfig`（或 `defineConfig`）：
+
+```ts
+import { defineUnoConfig } from "@hlw-uni-mp/vite-plugin";
+
+// 零配置即可享受全套默认规则；如有项目专属定制，直接传入对象即可深度覆盖：
+export default defineUnoConfig({
+    // shortcuts: [
+    //     ["container", "relative z-10 flex flex-col w-full mx-auto p-4 gap-4 text-slate-900"], // 同名直接覆盖默认
+    // ],
+    // theme: {
+    //     colors: { primary: { DEFAULT: "#059669" } }, // 深度合并覆盖颜色
+    // },
 });
 ```
 

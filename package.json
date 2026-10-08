@@ -1,6 +1,6 @@
 {
   "name": "@hlw-uni-mp/vite-plugin",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "HLW Vite Plugin for auto app environment variables and type definitions",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -16,6 +16,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
