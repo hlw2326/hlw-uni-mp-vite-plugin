@@ -25,12 +25,7 @@ export function createDefaultPresets(options: PresetsOptions = {}) {
                 display: "inline-block",
                 "vertical-align": "middle",
             },
-            collections: {
-                "fa6-solid": () => import("@iconify-json/fa6-solid/icons.json").then((i: any) => i.default || i),
-                "fa6-brands": () => import("@iconify-json/fa6-brands/icons.json").then((i: any) => i.default || i),
-                ri: () => import("@iconify-json/ri/icons.json").then((i: any) => i.default || i),
-                ...(options.iconsCollections || {}),
-            },
+            collections: options.iconsCollections,
         }),
     ];
 

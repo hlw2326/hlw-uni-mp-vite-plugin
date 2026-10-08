@@ -27,8 +27,8 @@ export interface HlwUnoOptions extends Record<string, any> {
 /**
  * 生成基础默认 UnoCSS 配置
  */
-export function getBaseUnoConfig(options: PresetsOptions = {}): Record<string, any> {
-    const { presets, transformers } = createDefaultPresets(options);
+export function getBaseUnoConfig(opts: PresetsOptions = {}): Record<string, any> {
+    const { presets, transformers } = createDefaultPresets(opts);
 
     return {
         presets,
@@ -45,16 +45,16 @@ export function getBaseUnoConfig(options: PresetsOptions = {}): Record<string, a
  * 内置所有微信小程序端基础适配预设、字号变量、色彩体系、全局 .container 容器与高频图标白名单
  * 业务工程传入的配置将智能深度覆盖默认配置（同名直接覆盖，无重名则合并追加）
  *
- * @param userConfig 用户扩展或覆盖配置
+ * @param conf 用户扩展或覆盖配置
  * @returns 完整的 UnoCSS 配置对象
  */
-export function hlwUnoConfig(userConfig: HlwUnoOptions = {}): Record<string, any> {
-    const baseConfig = getBaseUnoConfig({
-        iconsCollections: userConfig.iconsCollections,
-        iconsScale: userConfig.iconsScale,
+export function hlwUnoConfig(conf: HlwUnoOptions = {}): Record<string, any> {
+    const base = getBaseUnoConfig({
+        iconsCollections: conf.iconsCollections,
+        iconsScale: conf.iconsScale,
     });
 
-    return mergeUnoConfig(baseConfig, userConfig);
+    return mergeUnoConfig(base, conf);
 }
 
 export {

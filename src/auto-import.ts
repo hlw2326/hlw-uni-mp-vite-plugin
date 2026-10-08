@@ -8,11 +8,10 @@ export function getAutoImportConfig() {
 	return [
 		{ vue: ['ref', 'computed', 'reactive', 'watch', 'onMounted'] },
 		{ '@dcloudio/uni-app': ['onShow', 'onHide', 'onLaunch', 'onShareAppMessage', 'onShareTimeline', 'onPullDownRefresh', 'onReachBottom'] },
-		{ '@hlw-uni-mp/use': ['useTheme', 'useRefs', 'useShare', 'usePaging'] },
+		{ '@hlw-uni-mp/use': ['useTheme', 'useRefs', 'useShare', 'useAd', 'usePaging'] },
 		{
 			'@hlw-uni-mp/utils': [
 				'hlw',
-				'useMsg',
 				'toast',
 				'modal',
 				'navigateTo',
@@ -22,7 +21,6 @@ export function getAutoImportConfig() {
 				'navigateBack',
 				'copy',
 				'paste',
-				'formatConvertNumber',
 				'formatNumber',
 				'formatNum',
 				'safeDecode',
@@ -43,10 +41,10 @@ export function getAutoImportConfig() {
 /**
  * 自动按需导入插件
  */
-export function createAutoImportPlugin(options: { dts?: string } = {}): Plugin {
+export function createAutoImportPlugin(opts: { dts?: string } = {}): Plugin {
 	return (AutoImport as unknown as (opt: unknown) => Plugin)({
 		imports: getAutoImportConfig(),
 		vueTemplate: true,
-		dts: options.dts || 'src/imports.d.ts'
+		dts: opts.dts || 'src/imports.d.ts'
 	})
 }

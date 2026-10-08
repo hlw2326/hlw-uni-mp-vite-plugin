@@ -1,16 +1,29 @@
 {
   "name": "@hlw-uni-mp/vite-plugin",
-  "version": "1.0.18",
+  "version": "1.0.20",
   "description": "HLW Vite Plugin for auto app environment variables and type definitions",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "unocss": [
+        "./dist/unocss.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./unocss": {
+      "types": "./dist/unocss.d.ts",
+      "import": "./dist/unocss.mjs",
+      "require": "./dist/unocss.js",
+      "default": "./dist/unocss.mjs"
     }
   },
   "files": [
