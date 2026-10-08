@@ -41,6 +41,7 @@ __export(index_exports, {
   defineUnoConfig: () => defineUnoConfig,
   getBaseUnoConfig: () => getBaseUnoConfig,
   hlwPlugin: () => hlwPlugin,
+  hlwUnoConfig: () => hlwUnoConfig,
   mergeShortcuts: () => mergeShortcuts,
   mergeUnoConfig: () => mergeUnoConfig
 });
@@ -731,16 +732,17 @@ function getBaseUnoConfig(options = {}) {
     transformers
   };
 }
-function defineUnoConfig(userConfig = {}) {
+function hlwUnoConfig(userConfig = {}) {
   const baseConfig = getBaseUnoConfig({
     iconsCollections: userConfig.iconsCollections,
     iconsScale: userConfig.iconsScale
   });
   return mergeUnoConfig(baseConfig, userConfig);
 }
-var defineConfig = defineUnoConfig;
-var defineHlwUnoConfig = defineUnoConfig;
-var createHlwUnoConfig = defineUnoConfig;
+var defineUnoConfig = hlwUnoConfig;
+var defineConfig = hlwUnoConfig;
+var defineHlwUnoConfig = hlwUnoConfig;
+var createHlwUnoConfig = hlwUnoConfig;
 
 // src/index.ts
 function createDefinePlugin(options = {}) {
@@ -825,6 +827,7 @@ function hlwPlugin(options = {}) {
   defineUnoConfig,
   getBaseUnoConfig,
   hlwPlugin,
+  hlwUnoConfig,
   mergeShortcuts,
   mergeUnoConfig
 });

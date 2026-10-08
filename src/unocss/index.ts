@@ -48,7 +48,7 @@ export function getBaseUnoConfig(options: PresetsOptions = {}): Record<string, a
  * @param userConfig 用户扩展或覆盖配置
  * @returns 完整的 UnoCSS 配置对象
  */
-export function defineUnoConfig(userConfig: HlwUnoOptions = {}): Record<string, any> {
+export function hlwUnoConfig(userConfig: HlwUnoOptions = {}): Record<string, any> {
     const baseConfig = getBaseUnoConfig({
         iconsCollections: userConfig.iconsCollections,
         iconsScale: userConfig.iconsScale,
@@ -57,10 +57,11 @@ export function defineUnoConfig(userConfig: HlwUnoOptions = {}): Record<string, 
     return mergeUnoConfig(baseConfig, userConfig);
 }
 
-// 极简与兼容别名
-export const defineConfig = defineUnoConfig;
-export const defineHlwUnoConfig = defineUnoConfig;
-export const createHlwUnoConfig = defineUnoConfig;
+// 别名兼容
+export const defineUnoConfig = hlwUnoConfig;
+export const defineConfig = hlwUnoConfig;
+export const defineHlwUnoConfig = hlwUnoConfig;
+export const createHlwUnoConfig = hlwUnoConfig;
 
 export {
     defaultTheme,
