@@ -5,14 +5,14 @@ import { extractorAttributify, transformerClass } from "unocss-preset-weapp/tran
 import transformerDirectives from "@unocss/transformer-directives";
 import { presetIcons } from "@unocss/preset-icons";
 
-export interface PresetsOptions {
+export interface PresetsOption {
     /** 额外的 iconify 图标集合加载器 */
     iconsCollections?: Record<string, () => Promise<any>>;
     /** presetIcons scale 缩放比例，默认 1.2 */
     iconsScale?: number;
 }
 
-export function createDefaultPresets(options: PresetsOptions = {}) {
+export function createDefaultPresets(options: PresetsOption = {}) {
     const { presetWeappAttributify, transformerAttributify } = extractorAttributify();
 
     const presets = [

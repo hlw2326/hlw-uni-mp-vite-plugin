@@ -3,7 +3,7 @@ import { Plugin } from 'vite';
 /**
  * 插件配置项
  */
-interface PluginOptions {
+interface PluginOption {
     /** 运行根目录 */
     cwd?: string;
     /** 基础服务址 */
@@ -26,6 +26,6 @@ interface PluginOptions {
 /**
  * 集成统一 Vite 插件
  */
-declare function hlwPlugin(options?: PluginOptions): Plugin[];
+declare function hlwPlugin(options?: PluginOption): Plugin[];
 
-export { type PluginOptions, hlwPlugin };
+export { type PluginOption, hlwPlugin };

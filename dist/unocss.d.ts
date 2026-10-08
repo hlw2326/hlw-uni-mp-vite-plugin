@@ -1,4 +1,4 @@
-interface PresetsOptions {
+interface PresetsOption {
     /** 额外的 iconify 图标集合加载器 */
     iconsCollections?: Record<string, () => Promise<any>>;
     /** presetIcons scale 缩放比例，默认 1.2 */
@@ -126,7 +126,7 @@ declare function mergeShortcuts(defaultShortcuts: any[], userShortcuts?: any): a
  */
 declare function mergeUnoConfig(defaultConfig: Record<string, any>, userConfig?: Record<string, any>): Record<string, any>;
 
-interface HlwUnoOptions extends Record<string, any> {
+interface HlwUnoOption extends Record<string, any> {
     /** 额外的 iconify 图标集合加载器 */
     iconsCollections?: Record<string, () => Promise<any>>;
     /** presetIcons 缩放比例，默认 1.2 */
@@ -147,7 +147,7 @@ interface HlwUnoOptions extends Record<string, any> {
 /**
  * 生成基础默认 UnoCSS 配置
  */
-declare function getBaseUnoConfig(opts?: PresetsOptions): Record<string, any>;
+declare function getBaseUnoConfig(options?: PresetsOption): Record<string, any>;
 /**
  * 定义 HLW 标准生态 UnoCSS 配置
  * 内置所有微信小程序端基础适配预设、字号变量、色彩体系、全局 .container 容器与高频图标白名单
@@ -156,6 +156,6 @@ declare function getBaseUnoConfig(opts?: PresetsOptions): Record<string, any>;
  * @param conf 用户扩展或覆盖配置
  * @returns 完整的 UnoCSS 配置对象
  */
-declare function hlwUnoConfig(conf?: HlwUnoOptions): Record<string, any>;
+declare function hlwUnoConfig(conf?: HlwUnoOption): Record<string, any>;
 
-export { type HlwUnoOptions, deepMerge, defaultRules, defaultSafelist, defaultShortcuts, defaultTheme, getBaseUnoConfig, hlwUnoConfig, mergeShortcuts, mergeUnoConfig };
+export { type HlwUnoOption, deepMerge, defaultRules, defaultSafelist, defaultShortcuts, defaultTheme, getBaseUnoConfig, hlwUnoConfig, mergeShortcuts, mergeUnoConfig };

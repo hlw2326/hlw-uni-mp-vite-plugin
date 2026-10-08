@@ -1,11 +1,11 @@
-import { createDefaultPresets, type PresetsOptions } from "./presets";
+import { createDefaultPresets, type PresetsOption } from "./presets";
 import { defaultTheme } from "./theme";
 import { defaultShortcuts } from "./shortcuts";
 import { defaultRules } from "./rules";
 import { defaultSafelist } from "./safelist";
 import { mergeUnoConfig, deepMerge, mergeShortcuts } from "./merge";
 
-export interface HlwUnoOptions extends Record<string, any> {
+export interface HlwUnoOption extends Record<string, any> {
     /** 额外的 iconify 图标集合加载器 */
     iconsCollections?: Record<string, () => Promise<any>>;
     /** presetIcons 缩放比例，默认 1.2 */
@@ -27,8 +27,8 @@ export interface HlwUnoOptions extends Record<string, any> {
 /**
  * 生成基础默认 UnoCSS 配置
  */
-export function getBaseUnoConfig(opts: PresetsOptions = {}): Record<string, any> {
-    const { presets, transformers } = createDefaultPresets(opts);
+export function getBaseUnoConfig(options: PresetsOption = {}): Record<string, any> {
+    const { presets, transformers } = createDefaultPresets(options);
 
     return {
         presets,
@@ -48,7 +48,7 @@ export function getBaseUnoConfig(opts: PresetsOptions = {}): Record<string, any>
  * @param conf 用户扩展或覆盖配置
  * @returns 完整的 UnoCSS 配置对象
  */
-export function hlwUnoConfig(conf: HlwUnoOptions = {}): Record<string, any> {
+export function hlwUnoConfig(conf: HlwUnoOption = {}): Record<string, any> {
     const base = getBaseUnoConfig({
         iconsCollections: conf.iconsCollections,
         iconsScale: conf.iconsScale,

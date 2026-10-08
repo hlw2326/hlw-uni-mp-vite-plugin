@@ -465,8 +465,8 @@ function mergeUnoConfig(defaultConfig, userConfig = {}) {
 }
 
 // src/unocss/index.ts
-function getBaseUnoConfig(opts = {}) {
-  const { presets, transformers } = createDefaultPresets(opts);
+function getBaseUnoConfig(options = {}) {
+  const { presets, transformers } = createDefaultPresets(options);
   return {
     presets,
     theme: defaultTheme,

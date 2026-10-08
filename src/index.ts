@@ -10,7 +10,7 @@ import { createMpShimPlugin } from './shim'
 /**
  * 插件配置项
  */
-export interface PluginOptions {
+export interface PluginOption {
 	/** 运行根目录 */
 	cwd?: string
 	/** 基础服务址 */
@@ -34,7 +34,7 @@ export interface PluginOptions {
 /**
  * 注入应用宏定义与环境变量插件
  */
-function createDefinePlugin(options: PluginOptions = {}): Plugin {
+function createDefinePlugin(options: PluginOption = {}): Plugin {
 	return {
 		name: 'hlw-define',
 		config(_, { mode }: ConfigEnv) {
@@ -103,7 +103,7 @@ function createBundleStatsPlugin(): Plugin {
 /**
  * 集成统一 Vite 插件
  */
-export function hlwPlugin(options: PluginOptions = {}): Plugin[] {
+export function hlwPlugin(options: PluginOption = {}): Plugin[] {
 	const plugins: Plugin[] = [
 		createCopyTransformPlugin(),
 		createDefinePlugin(options),
