@@ -57,12 +57,6 @@ export function hlwUnoConfig(userConfig: HlwUnoOptions = {}): Record<string, any
     return mergeUnoConfig(baseConfig, userConfig);
 }
 
-// 别名兼容
-export const defineUnoConfig = hlwUnoConfig;
-export const defineConfig = hlwUnoConfig;
-export const defineHlwUnoConfig = hlwUnoConfig;
-export const createHlwUnoConfig = hlwUnoConfig;
-
 export {
     defaultTheme,
     defaultShortcuts,

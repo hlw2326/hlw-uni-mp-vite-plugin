@@ -699,10 +699,6 @@ function hlwUnoConfig(userConfig = {}) {
   });
   return mergeUnoConfig(baseConfig, userConfig);
 }
-var defineUnoConfig = hlwUnoConfig;
-var defineConfig = hlwUnoConfig;
-var defineHlwUnoConfig = hlwUnoConfig;
-var createHlwUnoConfig = hlwUnoConfig;
 
 // src/index.ts
 function createDefinePlugin(options = {}) {
@@ -775,15 +771,11 @@ function hlwPlugin(options = {}) {
   return plugins;
 }
 export {
-  createHlwUnoConfig,
   deepMerge,
   defaultRules,
   defaultSafelist,
   defaultShortcuts,
   defaultTheme,
-  defineConfig,
-  defineHlwUnoConfig,
-  defineUnoConfig,
   getBaseUnoConfig,
   hlwPlugin,
   hlwUnoConfig,

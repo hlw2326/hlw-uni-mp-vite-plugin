@@ -30,15 +30,11 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  createHlwUnoConfig: () => createHlwUnoConfig,
   deepMerge: () => deepMerge,
   defaultRules: () => defaultRules,
   defaultSafelist: () => defaultSafelist,
   defaultShortcuts: () => defaultShortcuts,
   defaultTheme: () => defaultTheme,
-  defineConfig: () => defineConfig,
-  defineHlwUnoConfig: () => defineHlwUnoConfig,
-  defineUnoConfig: () => defineUnoConfig,
   getBaseUnoConfig: () => getBaseUnoConfig,
   hlwPlugin: () => hlwPlugin,
   hlwUnoConfig: () => hlwUnoConfig,
@@ -739,10 +735,6 @@ function hlwUnoConfig(userConfig = {}) {
   });
   return mergeUnoConfig(baseConfig, userConfig);
 }
-var defineUnoConfig = hlwUnoConfig;
-var defineConfig = hlwUnoConfig;
-var defineHlwUnoConfig = hlwUnoConfig;
-var createHlwUnoConfig = hlwUnoConfig;
 
 // src/index.ts
 function createDefinePlugin(options = {}) {
@@ -816,15 +808,11 @@ function hlwPlugin(options = {}) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  createHlwUnoConfig,
   deepMerge,
   defaultRules,
   defaultSafelist,
   defaultShortcuts,
   defaultTheme,
-  defineConfig,
-  defineHlwUnoConfig,
-  defineUnoConfig,
   getBaseUnoConfig,
   hlwPlugin,
   hlwUnoConfig,

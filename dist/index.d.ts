@@ -159,10 +159,6 @@ declare function getBaseUnoConfig(options?: PresetsOptions): Record<string, any>
  * @returns 完整的 UnoCSS 配置对象
  */
 declare function hlwUnoConfig(userConfig?: HlwUnoOptions): Record<string, any>;
-declare const defineUnoConfig: typeof hlwUnoConfig;
-declare const defineConfig: typeof hlwUnoConfig;
-declare const defineHlwUnoConfig: typeof hlwUnoConfig;
-declare const createHlwUnoConfig: typeof hlwUnoConfig;
 
 /**
  * 插件配置项
@@ -192,4 +188,4 @@ interface PluginOptions {
  */
 declare function hlwPlugin(options?: PluginOptions): Plugin[];
 
-export { type HlwUnoOptions, type PluginOptions, createHlwUnoConfig, deepMerge, defaultRules, defaultSafelist, defaultShortcuts, defaultTheme, defineConfig, defineHlwUnoConfig, defineUnoConfig, getBaseUnoConfig, hlwPlugin, hlwUnoConfig, mergeShortcuts, mergeUnoConfig };
+export { type HlwUnoOptions, type PluginOptions, deepMerge, defaultRules, defaultSafelist, defaultShortcuts, defaultTheme, getBaseUnoConfig, hlwPlugin, hlwUnoConfig, mergeShortcuts, mergeUnoConfig };
